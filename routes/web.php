@@ -1,0 +1,24 @@
+<?php
+use App\Http\Controllers\ProductController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+return view('welcome');
+});
+
+Route::get('/whoami', function () {
+return 'Your Name | Block 4A | ITRACKB4 Laravel 12';
+});
+
+Route::get('/products/featured', [ProductController::class, 'featured'])->name('products.featured');
+
+Route::get('/products/filter/{category?}', function ($category = null) {
+if ($category === null) {
+return redirect()->route('products.index');
+}
+
+return redirect()->route('products.index', ['category' => $category]);
+})->name('products.filter');
+
+Route::resource('products', ProductController::class)->only(['index',
+'show']);
