@@ -1,29 +1,25 @@
-# LA9 - Your Own Table, Your Own Model
-
+# LA10 - Your Own Lookup Table
 
 Name: Rostom P. Vigil
 Course: ITRACKB4 - Web Systems and Technologies: Web Programming 2
-My products table holds sari-sari store items with six columns: name, price,
-stock, category, is_available and brand. My pages now read from this table
-through the Product model instead of storage/products.json.
+My sari-sari store products now have a lookup table called categories. Each product
+keeps a category_id that points to its category, instead of repeating the category text.
 
-## F1. Which column did you make nullable, and why that one and not another?
-I made `brand` nullable. Some of my products, like Fresh Egg, Ensaymada and
-Spanish Bread from the local bakery, have no brand at all, so an empty brand is
-true information, not missing data. Every product must still have a name,
-price, stock, category and availability, so none of those can be empty.
+## G1. Which column did you turn into a table, and why that one and not another?
+I turned `category` into a table. It comes from a fixed list (Drinks, Pantry, Canned and
+Bakery), the same values repeat across my eight products (Coke and Kopiko are both
+Drinks), and a category could later need details of its own, like a description. My other
+columns do not qualify: price and stock are numbers, is_available is true or false, and
+name and brand are free text that is different for almost every product.
 
-## F2. Which step failed first for you, and what did the error say?
-The first failure was in Part B, when I ran Product::create() in Tinker before
-adding $fillable. It threw a MassAssignmentException saying "Add [name] to
-fillable property to allow mass assignment on [App\Models\Product]." After I
-listed all six columns in $fillable and restarted Tinker, the same line
-created the product.
+## G2. What number did screenshot 6 show, and why exactly that number?
+Screenshot 6 showed 9 queries. My list page shows 8 products, so Laravel ran 1 query to
+fetch all the products, plus 1 more query for each product to fetch its category, because
+`$product->category->name` is read inside the loop. That is 1 + 8 = 9. After I added
+`with('category')` it dropped to 2.
 
-## F3. You changed no Blade file in Part D, yet your pages still work. Why not?
-My controller still sends the same variable names to the same views: $products
-to products.index, and $product and $heading to products.show. My table columns
-use the same names as the old JSON keys (id, name, price, stock, category), and
-a Product model can be read with $product['name'] just like an array. So
-index.blade.php and show.blade.php cannot tell that the data now comes from the
-database.
+## G3. Your belongsTo method is named in the singular. What would break if you made it plural?
+If I named it `categories()` instead of `category()`, Eloquent would look for a column
+called `categories_id` in my products table, but my column is `category_id`. It would not
+find it, so every product's category would come back as null and my list page would crash
+with the error "Attempt to read property name on null".

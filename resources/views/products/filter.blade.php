@@ -30,7 +30,7 @@
                         <td><a href="{{ route('products.show', $product['id']) }}">{{ $product['name'] }}</a></td>
                         <td>{{ $product['price'] }}</td>
                         <td>{{ $product['stock'] }}</td>
-                        <td>{{ $product['category'] }}</td>
+                        <td>{{ $product->category->name }}</td>
                     </tr>
                 @endforeach
             </tbody>
