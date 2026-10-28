@@ -28,6 +28,13 @@
                     <td>{{ $product->category->name }}</td>
                     <td>
                         <a class="btn btn-primary btn-sm" href="{{ route('products.show', $product['id']) }}">View</a>
+                        <a class="btn btn-warning btn-sm" href="{{ route('products.edit', $product) }}">Edit</a>
+                        <form action="{{ route('products.destroy', $product) }}" method="POST" class="d-inline"
+                            onsubmit="return confirm('Delete this record?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
                     </td>
                 </tr>
             @empty

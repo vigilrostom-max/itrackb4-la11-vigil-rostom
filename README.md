@@ -1,25 +1,29 @@
-# LA10 - Your Own Lookup Table
+# LA11 - Finish Your Own CRUD
 
 Name: Rostom P. Vigil
 Course: ITRACKB4 - Web Systems and Technologies: Web Programming 2
-My sari-sari store products now have a lookup table called categories. Each product
-keeps a category_id that points to its category, instead of repeating the category text.
+My sari-sari store products now have all seven resource actions. I can add, view, edit and
+delete a product, and every product still shows its category name.
 
-## G1. Which column did you turn into a table, and why that one and not another?
-I turned `category` into a table. It comes from a fixed list (Drinks, Pantry, Canned and
-Bakery), the same values repeat across my eight products (Coke and Kopiko are both
-Drinks), and a category could later need details of its own, like a description. My other
-columns do not qualify: price and stock are numbers, is_available is true or false, and
-name and brand are free text that is different for almost every product.
+## G1. Route model binding: the two things that must be true
+Two things must be true: the parameter in my ProductController method is type-hinted with the
+Product model, and its name is exactly $product, the same word as the {product} segment in
+/products/{product}. If I type-hint Product but name the variable something else like $item,
+Laravel gives me an empty, unsaved Product instead of the real one, so my pages show blank
+values or break and nothing says why. If the name is $product but I leave out the type-hint,
+$product is only the id number from the URL, so $product->name fails.
 
-## G2. What number did screenshot 6 show, and why exactly that number?
-Screenshot 6 showed 9 queries. My list page shows 8 products, so Laravel ran 1 query to
-fetch all the products, plus 1 more query for each product to fetch its category, because
-`$product->category->name` is read inside the loop. That is 1 + 8 = 9. After I added
-`with('category')` it dropped to 2.
+## G2. Why my Delete link did not delete
+A link can only send a GET request. In my project the address /products/{id} is shared by
+show (GET), update (PUT) and destroy (DELETE), and Laravel picks the route by the address and
+the verb together. My link had the right address but the wrong verb, so it never reached
+destroy() and nothing was deleted; it just opened the Product Details page for the same
+product. Only a form with @method('DELETE') makes Laravel see a DELETE request.
 
-## G3. Your belongsTo method is named in the singular. What would break if you made it plural?
-If I named it `categories()` instead of `category()`, Eloquent would look for a column
-called `categories_id` in my products table, but my column is `category_id`. It would not
-find it, so every product's category would come back as null and my list page would crash
-with the error "Attempt to read property name on null".
+## G3. The second argument of old() on my edit form
+The second argument is the fallback: old('name', $product->name) shows what I just typed if the
+form was rejected, and the product's saved value otherwise. If I left it out and wrote only
+old('name'), my edit form would open blank, like my screenshot 3, because nothing was typed yet.
+If I used only the second part, {{ $product->name }}, the form would open filled, but after a
+rejected submit my typed values (like the Stock I changed to 77) would be thrown away and the
+original saved values would come back.
