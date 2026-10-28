@@ -1,18 +1,29 @@
-# LA7 - Let Them Add Something
+# LA9 - Your Own Table, Your Own Model
+
 
 Name: Rostom P. Vigil
 Course: ITRACKB4 - Web Systems and Technologies: Web Programming 2
-My form adds a product with a name, price, stock, and category.
-Products are saved in storage/products.json.
+My products table holds sari-sari store items with six columns: name, price,
+stock, category, is_available and brand. My pages now read from this table
+through the Product model instead of storage/products.json.
 
-## Q1. Why does the form use POST instead of GET?
+## F1. Which column did you make nullable, and why that one and not another?
+I made `brand` nullable. Some of my products, like Fresh Egg, Ensaymada and
+Spanish Bread from the local bakery, have no brand at all, so an empty brand is
+true information, not missing data. Every product must still have a name,
+price, stock, category and availability, so none of those can be empty.
 
-GET puts the form values into the URL, like /products? name=Pancit+Canton&price=18 . They show in the address bar and in history. GET is meant for reading. A browser repeats a GET freely on refresh, with no warning. If saving happened on a GET, every refresh would save another copy. A browser knows POST sends data. It warns before repeating one, and your redirect means a refresh only repeats the harmless GET of the list. In your own project, a GET form would go to GET /products , which is index , so store() would never even run. The values would just become a query string, like your filters.
+## F2. Which step failed first for you, and what did the error say?
+The first failure was in Part B, when I ran Product::create() in Tinker before
+adding $fillable. It threw a MassAssignmentException saying "Add [name] to
+fillable property to allow mass assignment on [App\Models\Product]." After I
+listed all six columns in $fillable and restarted Tinker, the same line
+created the product.
 
-## Q2. What stops the save when validation fails, and where does the visitor end up?
-
-$request->validate([...]) stops the method by itself when a rule fails. It throws a validation exception, so the lines after it never run: no getProducts , no saveProducts , no redirect to the list. Laravel catches that and sends the visitor back to where they came from: /products/create . It also puts the error messages and what they typed into the session for one page load. That's what @error and old() read. You checked this in test 4: the JSON still had 8 products.
-
-## Q3. The layout renders on every page. Why doesn't the success message appear on every page?
-
-The layout DOES check on every page: @if (session('success')) runs everywhere. But ->with('success', ...) is "flash" data. It stays in the session for the next page load only, then Laravel deletes it. The redirect's page (the list) is that one page load, so the message shows there. On any refresh or next page, the session is empty, so the @if is false and nothing shows. Both are true at once: the check is everywhere, but the message only exists for one request.
+## F3. You changed no Blade file in Part D, yet your pages still work. Why not?
+My controller still sends the same variable names to the same views: $products
+to products.index, and $product and $heading to products.show. My table columns
+use the same names as the old JSON keys (id, name, price, stock, category), and
+a Product model can be read with $product['name'] just like an array. So
+index.blade.php and show.blade.php cannot tell that the data now comes from the
+database.
